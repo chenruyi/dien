@@ -19,7 +19,8 @@ def load_dict(filename):
             return unicode_to_utf8(json.load(f))
     except:
         with open(filename, 'rb') as f:
-            return unicode_to_utf8(pkl.load(f))
+            pkl.load(f)
+            #return unicode_to_utf8(pkl.load(f))
 
 
 def fopen(filename, mode='r'):
@@ -50,7 +51,7 @@ class DataIterator:
         for source_dict in [uid_voc, mid_voc, cat_voc]:
             self.source_dicts.append(load_dict(source_dict))
 
-        f_meta = open("item-info", "r")
+        f_meta = open("item-info", "r",  encoding='utf-8')
         meta_map = {}
         for line in f_meta:
             arr = line.strip().split("\t")
@@ -69,7 +70,7 @@ class DataIterator:
                 cat_idx = 0
             self.meta_id_map[mid_idx] = cat_idx
 
-        f_review = open("reviews-info", "r")
+        f_review = open("reviews-info", "r",  encoding='utf-8')
         self.mid_list_for_random = []
         for line in f_review:
             arr = line.strip().split("\t")
