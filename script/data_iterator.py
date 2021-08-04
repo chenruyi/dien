@@ -1,6 +1,9 @@
 import numpy
 import json
-import cPickle as pkl
+try:
+    import cPickle as pkl
+except:
+    import pickle as pkl
 import random
 
 import gzip
