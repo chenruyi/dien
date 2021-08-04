@@ -45,7 +45,7 @@ _concat = rnn_cell_impl._concat
 # _like_rnncell = rnn_cell_impl._like_rnncell
 def _like_rnncell(cell):
     rnn_cell_impl.assert_like_rnncell("cell", cell)
-
+    return True
 # pylint: enable=protected-access
 
 
