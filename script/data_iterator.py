@@ -100,7 +100,8 @@ class DataIterator:
 
     def __iter__(self):
         return self
-
+    def __next__(self):
+        return self.next()
     def reset(self):
         if self.shuffle:
             self.source= shuffle.main(self.source_orig, temporary=True)
