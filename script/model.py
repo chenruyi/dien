@@ -9,6 +9,7 @@ from Dice import dice
 
 class Model(object):
     def __init__(self, n_uid, n_mid, n_cat, EMBEDDING_DIM, HIDDEN_SIZE, ATTENTION_SIZE, use_negsampling = False):
+
         with tf.name_scope('Inputs'):
             self.mid_his_batch_ph = tf.placeholder(tf.int32, [None, None], name='mid_his_batch_ph')
             self.cat_his_batch_ph = tf.placeholder(tf.int32, [None, None], name='cat_his_batch_ph')
@@ -112,7 +113,7 @@ class Model(object):
 
     def train(self, sess, inps):
         if self.use_negsampling:
-            loss, accuracy, aux_loss, _ = sess.run([self.loss, self.accuracy, self.aux_loss, self.optimizer], feed_dict={
+            merged, loss, accuracy, aux_loss, _ = sess.run([self.merged, self.loss, self.accuracy, self.aux_loss, self.optimizer], feed_dict={
                 self.uid_batch_ph: inps[0],
                 self.mid_batch_ph: inps[1],
                 self.cat_batch_ph: inps[2],
@@ -125,9 +126,10 @@ class Model(object):
                 self.noclk_mid_batch_ph: inps[9],
                 self.noclk_cat_batch_ph: inps[10],
             })
-            return loss, accuracy, aux_loss
+           
+            return merged, loss, accuracy, aux_loss
         else:
-            loss, accuracy, _ = sess.run([self.loss, self.accuracy, self.optimizer], feed_dict={
+            merged, loss, accuracy, _ = sess.run([self.merged, self.loss, self.accuracy, self.optimizer], feed_dict={
                 self.uid_batch_ph: inps[0],
                 self.mid_batch_ph: inps[1],
                 self.cat_batch_ph: inps[2],
@@ -138,7 +140,8 @@ class Model(object):
                 self.seq_len_ph: inps[7],
                 self.lr: inps[8],
             })
-            return loss, accuracy, 0
+            
+            return merged, loss, accuracy, 0
 
     def calculate(self, sess, inps):
         if self.use_negsampling:
@@ -356,6 +359,7 @@ class Model_DIN_V2_Gru_Vec_attGru_Neg(Model):
             att_outputs, alphas = din_fcn_attention(self.item_eb, rnn_outputs, ATTENTION_SIZE, self.mask,
                                                     softmax_stag=1, stag='1_1', mode='LIST', return_alphas=True)
             tf.summary.histogram('alpha_outputs', alphas)
+            
 
         with tf.name_scope('rnn_2'):
             rnn_outputs2, final_state2 = dynamic_rnn(VecAttGRUCell(HIDDEN_SIZE), inputs=rnn_outputs,
