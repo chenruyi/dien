@@ -118,7 +118,11 @@ def train(
     model_path = "dnn_save_path/ckpt_noshuff" + model_type + str(seed)
     best_model_path = "dnn_best_model/ckpt_noshuff" + model_type + str(seed)
     gpu_options = tf.GPUOptions(allow_growth=True)
+    
     with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
+        
+        
+        writer = tf.summary.FileWriter("log", sess.graph)
         train_data = DataIterator(train_file, uid_voc, mid_voc, cat_voc, batch_size, maxlen, shuffle_each_epoch=False)
         test_data = DataIterator(test_file, uid_voc, mid_voc, cat_voc, batch_size, maxlen)
         n_uid, n_mid, n_cat = train_data.get_n()
@@ -149,7 +153,7 @@ def train(
         sys.stdout.flush()
         print('                                                                                      test_auc: %.4f ---- test_loss: %.4f ---- test_accuracy: %.4f ---- test_aux_loss: %.4f' % eval(sess, test_data, model, best_model_path))
         sys.stdout.flush()
-
+        
         start_time = time.time()
         iter = 0
         lr = 0.001
@@ -159,7 +163,11 @@ def train(
             aux_loss_sum = 0.
             for src, tgt in train_data:
                 uids, mids, cats, mid_his, cat_his, mid_mask, target, sl, noclk_mids, noclk_cats = prepare_data(src, tgt, maxlen, return_neg=True)
-                loss, acc, aux_loss = model.train(sess, [uids, mids, cats, mid_his, cat_his, mid_mask, target, sl, lr, noclk_mids, noclk_cats])
+                mm, loss, acc, aux_loss = model.train(sess, [uids, mids, cats, mid_his, cat_his, mid_mask, target, sl, lr, noclk_mids, noclk_cats])
+                writer.add_summary(mm, iter)
+                writer.flush()
+               # tf.contrib.summary.text("first_text", "111", step=0)
+                
                 loss_sum += loss
                 accuracy_sum += acc
                 aux_loss_sum += aux_loss
